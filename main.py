@@ -43,10 +43,9 @@ class Stock:
         self.initial_amount_invested_usd = initial_amount_invested_usd
     
     def price(self, date):
-        df = self.get_dataframe_ticker(date)
-        print(df)
-        price_at_date = df["Close"]
-        print(price_at_date)
+        end_date = self.get_next_day_date(date)
+        df = self.get_dataframe_ticker(date, end_date)
+        price_at_date = df["Close"][0]
         return price_at_date
     
     def get_realtime_price(self):
@@ -55,29 +54,38 @@ class Stock:
     
     def get_dataframe_ticker(self, start_date, end_date):
         ticker = yfinance.Ticker(self.symbol)
-        df = ticker.history(interval="1h",start=start_date,end=end_date)
+        df = ticker.history(interval="1d",start=start_date,end=end_date)
         return df
+    
+    def get_next_day_date(self, initial_date):
+        datetime_object_initial_date = datetime.strptime(initial_date, '%Y-%m-%d')
+        next_day_delta = timedelta(days = 1)
+        end_date = str(datetime_object_initial_date + next_day_delta).split(" ")[0]
+        return end_date
 
 
-"""Ejecutable de ejemplo"""
+"""Example"""
 
 if __name__ == '__main__':
     list_stocks_test = ['TSLA', 'AMZN', 'ROKU', 'PFE']
-    id_portfolio = input("Enter the identification number for the new portfolio: ")
+    id_portfolio = input("\n Enter the identification number for the new portfolio: ")
     portfolio_object = Portfolio(id_portfolio)
     index = 0
+    total_money_invested = 0
     for stock in list_stocks_test:
-        money_invested_usd = float(input("Quantity of money in USD to invest in {}: ".format(stock)))
+        money_invested_usd = float(input("\n Quantity of money in USD to invest in {}: ".format(stock)))
         price = float(stock_info.get_live_price(stock.lower()))
         #no se consideran comisiones
         quantity = money_invested_usd/price
         new_stock_object = Stock(index, stock, quantity, money_invested_usd)
         portfolio_object.add_stock_to_portfolio(new_stock_object)
-        index += 1
+        total_money_invested += money_invested_usd
     while True:
-        start_date = input("Starting date to check the portfolio profits yy-mm-dd: ")
-        end_date = input("Write a end date to check the portfolio profits yy-mm-yy: ")
+        start_date = input("\nEnter a starting date to check the portfolio profits yy-mm-dd: ")
+        end_date = input("Enter an end date to check the portfolio profits yy-mm-yy: ")
         total_profit = portfolio_object.profit(start_date,end_date)
-        print("Total profit: {} USD".format(total_profit))
-        print("Annualized return: {} USD".format(total_profit))
+        print("\nSummary of portfolio performance between {} and {}: \n".format(start_date, end_date))
+        print(" Total initial investment: {} USD".format(total_money_invested))
+        print(" Total profit: {} USD".format(total_profit))
+        print(" Annualized return: {} USD".format(total_profit))
     
