@@ -12,12 +12,13 @@ class Portfolio:
 
 
     def __init__(self, id):
-        """Each portfolio has a unique id which is needed to initialize it"""
+        """Each portfolio has a unique id which is needed to initialize it."""
         self.id = id
         self.stocks_list = list()
         self.total_initial_investment_usd = 0
     
     def profit(self, start_date, end_date):
+        """ Calculates and returns the total profit made by the portfolio between two dates"""
         total_profit = 0
         for stock in self.stocks_list:
             price_start_date = stock.price(start_date)
@@ -29,6 +30,7 @@ class Portfolio:
         return total_profit
     
     def get_annualized_return(self, start_date, end_date):
+        """ Calculates and returns the annualize return of the portfolio between two dates"""
         profit = self.profit(start_date,end_date)
         total_return_rate = (profit/self.total_initial_investment_usd)
         num_days_interval_portfolio = self.get_difference_in_days_dates(start_date, end_date)
@@ -36,10 +38,12 @@ class Portfolio:
         return annualized_return
 
     def add_stock_to_portfolio(self, stock_object):
+        """ Adds a Stock object to the porfolio list of stocks"""
         self.stocks_list.append(stock_object)
         self.total_initial_investment_usd += stock_object.initial_amount_invested_usd
     
     def get_difference_in_days_dates(self, start_date, end_date):
+        """ Calculates the difference is days between two dates"""
         start_datetime_object = datetime.strptime(start_date, "%Y-%m-%d")
         end_datetime_object = datetime.strptime(end_date, "%Y-%m-%d")
         return abs((start_datetime_object - end_datetime_object).days)
@@ -68,11 +72,13 @@ class Stock:
         return price_at_date
     
     def get_dataframe_ticker(self, start_date, end_date):
+        """ Gets and returns the yfinanace libary dataframe of the ticker between two dates"""
         ticker = yfinance.Ticker(self.symbol)
         df = ticker.history(interval="1d",start=start_date,end=end_date)
         return df
     
     def get_next_day_date(self, initial_date):
+        """ Returns the date of the day after an initial date"""
         datetime_object_initial_date = datetime.strptime(initial_date, '%Y-%m-%d')
         next_day_delta = timedelta(days = 1)
         end_date = str(datetime_object_initial_date + next_day_delta).split(" ")[0]
