@@ -34,7 +34,6 @@ class Portfolio:
         profit = self.profit(start_date,end_date)
         total_return_rate = (profit/self.total_initial_investment_usd)
         num_days_interval_portfolio = self.get_difference_in_days_dates(start_date, end_date)
-        print(1/(num_days_interval_portfolio/365))
         annualized_return = ((1 + float(total_return_rate))**(1/(float(num_days_interval_portfolio)/365))) - 1
         return annualized_return
 
