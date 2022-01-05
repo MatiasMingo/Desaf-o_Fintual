@@ -34,6 +34,7 @@ class Portfolio:
         profit = self.profit(start_date,end_date)
         total_return_rate = (profit/self.total_initial_investment_usd)
         num_days_interval_portfolio = self.get_difference_in_days_dates(start_date, end_date)
+        print(1/(num_days_interval_portfolio/365))
         annualized_return = ((1 + float(total_return_rate))**(1/(float(num_days_interval_portfolio)/365))) - 1
         return annualized_return
 
@@ -68,8 +69,12 @@ class Stock:
         """
         end_date = self.get_next_day_date(date)
         df = self.get_dataframe_ticker(date, end_date)
-        price_at_date = df["Close"][0]
-        return price_at_date
+        try:
+            price_at_date = df["Close"][0]
+            return price_at_date
+        except:
+            print("No data found for this date range")
+            return
     
     def get_dataframe_ticker(self, start_date, end_date):
         """ Gets and returns the yfinanace libary dataframe of the ticker between two dates"""
@@ -102,11 +107,15 @@ if __name__ == '__main__':
         index += 1
     while True:
         start_date = input("\nEnter a starting date to check the portfolio profits yy-mm-dd: ")
-        end_date = input("Enter an end date to check the portfolio profits yy-mm-yy: ")
-        total_profit = portfolio_object.profit(start_date, end_date)
-        annualized_return = portfolio_object.get_annualized_return(start_date, end_date)
-        print("\nSummary of portfolio performance between {} and {}: \n".format(start_date, end_date))
-        print(" Total initial investment: {} USD".format(portfolio_object.total_initial_investment_usd))
-        print(" Total profit: {} USD".format(total_profit))
-        print(" Annualized return: {} USD".format(total_profit))
+        end_date = input("Enter an end date to check the portfolio profits yy-mm-dd: ")
+        try:
+            total_profit = portfolio_object.profit(start_date, end_date)
+            annualized_return = portfolio_object.get_annualized_return(start_date, end_date)
+            print("\nSummary of portfolio performance between {} and {}: \n".format(start_date, end_date))
+            print(" Total initial investment: {} USD".format(portfolio_object.total_initial_investment_usd))
+            print(" Total profit: {} USD".format(total_profit))
+            print(" Annualized return: {} USD".format(total_profit))
+        except:
+            print(" *******************The date range return an empty dataframe with the yfinance library. Choose new start and end dates :( **************")
+            continue
     
