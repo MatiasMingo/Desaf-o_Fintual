@@ -15,6 +15,7 @@ class Portfolio:
         """Each portfolio has a unique id which is needed to initialize it"""
         self.id = id
         self.stocks_list = list()
+        self.total_initial_investment_usd = 0
     
     def profit(self, start_date, end_date):
         total_profit = 0
@@ -29,11 +30,19 @@ class Portfolio:
     
     def get_annualized_return(self, start_date, end_date):
         profit = self.profit(start_date,end_date)
-        annualized_return = profit
+        total_return_rate = (profit/self.total_initial_investment_usd)
+        num_days_interval_portfolio = self.get_difference_in_days_dates(start_date, end_date)
+        annualized_return = ((1 + float(total_return_rate))**(1/(float(num_days_interval_portfolio)/365))) - 1
         return annualized_return
 
     def add_stock_to_portfolio(self, stock_object):
         self.stocks_list.append(stock_object)
+        self.total_initial_investment_usd += stock_object.initial_amount_invested_usd
+    
+    def get_difference_in_days_dates(self, start_date, end_date):
+        start_datetime_object = datetime.strptime(start_date, "%Y-%m-%d")
+        end_datetime_object = datetime.strptime(end_date, "%Y-%m-%d")
+        return abs((start_datetime_object - end_datetime_object).days)
 
 
 
@@ -78,20 +87,20 @@ if __name__ == '__main__':
     # New portfolio object is created
     portfolio_object = Portfolio(id_portfolio)
     index = 0
-    total_money_invested = 0
     # For each stock in the initial list of stocks we create a new Stock object and add it to the list of stocks in the Portfolio object
     for stock_symbol in list_stocks_test:
         money_invested_usd = float(input("\n Quantity of money in USD to invest in {}: ".format(stock_symbol)))
         """ In this example """
         new_stock_object = Stock(index, stock_symbol, money_invested_usd)
         portfolio_object.add_stock_to_portfolio(new_stock_object)
-        total_money_invested += money_invested_usd
+        index += 1
     while True:
         start_date = input("\nEnter a starting date to check the portfolio profits yy-mm-dd: ")
         end_date = input("Enter an end date to check the portfolio profits yy-mm-yy: ")
-        total_profit = portfolio_object.profit(start_date,end_date)
+        total_profit = portfolio_object.profit(start_date, end_date)
+        annualized_return = portfolio_object.get_annualized_return(start_date, end_date)
         print("\nSummary of portfolio performance between {} and {}: \n".format(start_date, end_date))
-        print(" Total initial investment: {} USD".format(total_money_invested))
+        print(" Total initial investment: {} USD".format(portfolio_object.total_initial_investment_usd))
         print(" Total profit: {} USD".format(total_profit))
         print(" Annualized return: {} USD".format(total_profit))
     
