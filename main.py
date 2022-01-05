@@ -43,8 +43,10 @@ class Stock:
         self.initial_amount_invested_usd = initial_amount_invested_usd
     
     def price(self, date):
-        df = self.get_dataframe_ticker(date, date)
+        df = self.get_dataframe_ticker(date)
+        print(df)
         price_at_date = df["Close"]
+        print(price_at_date)
         return price_at_date
     
     def get_realtime_price(self):
@@ -53,14 +55,14 @@ class Stock:
     
     def get_dataframe_ticker(self, start_date, end_date):
         ticker = yfinance.Ticker(self.symbol)
-        df = ticker.history(interval="1d",start=start_date,end=end_date)
+        df = ticker.history(interval="1h",start=start_date,end=end_date)
         return df
 
 
 """Ejecutable de ejemplo"""
 
 if __name__ == '__main__':
-    list_stocks_test = ['AMKR', 'AZPN', 'OZK', 'BBIO']
+    list_stocks_test = ['TSLA', 'AMZN', 'ROKU', 'PFE']
     id_portfolio = input("Enter the identification number for the new portfolio: ")
     portfolio_object = Portfolio(id_portfolio)
     index = 0
@@ -73,8 +75,8 @@ if __name__ == '__main__':
         portfolio_object.add_stock_to_portfolio(new_stock_object)
         index += 1
     while True:
-        start_date = input("Starting date to check the portfolio profits dd/mm/yy: ")
-        end_date = input("Write a end date to check the portfolio profits dd/mm/yy: ")
+        start_date = input("Starting date to check the portfolio profits yy-mm-dd: ")
+        end_date = input("Write a end date to check the portfolio profits yy-mm-yy: ")
         total_profit = portfolio_object.profit(start_date,end_date)
         print("Total profit: {} USD".format(total_profit))
         print("Annualized return: {} USD".format(total_profit))
