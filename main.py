@@ -113,7 +113,7 @@ if __name__ == '__main__':
             print("\nSummary of portfolio performance between {} and {}: \n".format(start_date, end_date))
             print(" Total initial investment: {} USD".format(portfolio_object.total_initial_investment_usd))
             print(" Total profit: {} USD".format(total_profit))
-            print(" Annualized return: {} USD".format(total_profit))
+            print(" Annualized return: {} %".format(annualized_return))
         except:
             print(" *******************The date range return an empty dataframe with the yfinance library. Choose new start and end dates :( **************")
             continue
