@@ -21,20 +21,30 @@ class Portfolio:
         """ Calculates and returns the total profit made by the portfolio between two dates"""
         total_profit = 0
         for stock in self.stocks_list:
-            price_start_date = stock.price(start_date)
-            price_end_date = stock.price(end_date)
+            print(stock.symbol)
+            price_start_date = stock.price(self.return_weekday_date(start_date))
+            price_end_date = stock.price(self.return_weekday_date(end_date))
             money_invested = stock.initial_amount_invested_usd 
             quantity = money_invested/price_start_date
             valuation_end_date = price_end_date*quantity
             total_profit += valuation_end_date - money_invested
         return total_profit
     
+    def return_weekday_date(self, date):
+        date_object = datetime.strptime(date, '%Y-%m-%d')
+        if date_object.isoweekday() in range(1, 6):
+            return date
+        if date_object.isoweekday() in range(6, 7):
+            date_object += datetime.timedelta(days=date_object.isoweekday() % 5)
+            date = str(date_object).split(" ")[0]
+            return date
+
     def get_annualized_return(self, start_date, end_date):
         """ Calculates and returns the annualize return of the portfolio between two dates"""
         profit = self.profit(start_date,end_date)
         total_return_rate = (profit/self.total_initial_investment_usd)
         num_days_interval_portfolio = self.get_difference_in_days_dates(start_date, end_date)
-        annualized_return = ((1 + float(total_return_rate))**(1/(float(num_days_interval_portfolio)/365))) - 1
+        annualized_return = (((1 + float(total_return_rate))**(1/(float(num_days_interval_portfolio)/365))) - 1)*100
         return annualized_return
 
     def add_stock_to_portfolio(self, stock_object):
@@ -105,8 +115,8 @@ if __name__ == '__main__':
         portfolio_object.add_stock_to_portfolio(new_stock_object)
         index += 1
     while True:
-        start_date = input("\nEnter a starting date to check the portfolio profits yy-mm-dd: ")
-        end_date = input("Enter an end date to check the portfolio profits yy-mm-dd: ")
+        start_date = input("\nEnter a starting date to check the portfolio profits yyyy-mm-dd: ")
+        end_date = input("Enter an end date to check the portfolio profits yyyy-mm-dd: ")
         try:
             total_profit = portfolio_object.profit(start_date, end_date)
             annualized_return = portfolio_object.get_annualized_return(start_date, end_date)
@@ -115,6 +125,6 @@ if __name__ == '__main__':
             print(" Total profit: {} USD".format(total_profit))
             print(" Annualized return: {} %".format(annualized_return))
         except:
-            print(" *******************The date range return an empty dataframe with the yfinance library. Choose new start and end dates :( **************")
+            print(" *******************The date range returns an empty dataframe with the yfinance library. Choose new start and end dates :( **************")
             continue
     
